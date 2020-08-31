@@ -1,4 +1,4 @@
-# Typescript Three.js Webpack Starter
+# Typescript Three.js Campus App.
 
 - Typescript support.
 - Webpack
