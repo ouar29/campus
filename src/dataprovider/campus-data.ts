@@ -19,7 +19,7 @@ export class CampusDataProvider {
                             geometry: [new Vector2(0,0), new Vector2(10,0), new Vector2(10,10), new Vector2(0,10)],
                             level: 0,
                             rooms: [
-                                { name: 'Room0', pos: new Vector2(2.5, 2.5), selected: true},
+                                { name: 'Room0', pos: new Vector2(2.5, 2.5), selected: false},
                                 { name: 'Room1', pos: new Vector2(8.0, 7.5)},
                             ]
                         },

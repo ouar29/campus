@@ -1,6 +1,6 @@
 import {DShape} from "./dshape";
 
-import { Mesh, Shape, MeshBasicMaterial, ShapeGeometry, Vector2, Material, CircleGeometry } from 'three'
+import { Mesh, Shape, MeshBasicMaterial, ShapeGeometry, Vector2, Material, CircleGeometry, Color } from 'three'
 
 export class DCircle implements DShape {
 
@@ -20,4 +20,7 @@ export class DCircle implements DShape {
         return this.mesh
     }
     
+    setColor(color: Color){
+        (<any>this.mesh.material).color = color;
+    }
 }

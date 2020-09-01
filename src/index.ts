@@ -28,6 +28,10 @@ import { CampusDataProvider } from './dataprovider/campus-data';
 import { BuildingView } from './view/building-view';
 import { GpuPickHelper } from './gpu-pick-helper';
 import { InfoCardBuilder } from './view/infocard/infocard';
+import { Room, Campus } from './model/model';
+import { DataSearch } from './data-search';
+import { CampusView } from './view/campus-view';
+import { RoomProcessData } from './view/processdata/room-processdata';
 
 export class App {
 
@@ -36,7 +40,8 @@ export class App {
   private renderer: WebGLRenderer;
   private box: Mesh;
   private pickingScene: Scene;
-
+  private campus: Campus;
+  private lastSelectedRoom: Room;
 
   constructor() {
     this.scene = new Scene();
@@ -165,18 +170,33 @@ export class App {
 
     var onSearch = () => {
       const searchedText = (<HTMLInputElement>document.getElementById("searchbox")).value;
-      const object = this.scene.getObjectByName( searchedText);
-      if(undefined !== object){
-        (<any>(<Mesh>object).material).color = new Color("red");
+
+      const foundRoom = DataSearch.findRoom(searchedText, this.campus, true);
+      if (undefined !== foundRoom) {
+        foundRoom.room.selected = true;
+        if(undefined !== this.lastSelectedRoom){
+          this.lastSelectedRoom.selected = false;
+        }
+        this.lastSelectedRoom = foundRoom.room;
+        this.modelToView();
 
         const lastInfoCard = document.getElementsByClassName("infocard")[0];
-        if(undefined !== lastInfoCard){
+        if (undefined !== lastInfoCard) {
           document.body.removeChild(lastInfoCard);
         }
 
-        const infoCard = InfoCardBuilder.newInfoCard({roomName: object.name, roomLocation: "N / 0", restrictedAccess: true});
+        const infoCard = InfoCardBuilder.newInfoCard({
+          roomName: foundRoom.room.name,
+          roomLocation: foundRoom.building + " / " + foundRoom.floor,
+          restrictedAccess: true
+        });
         document.body.appendChild(infoCard);
       }
+
+      // const object = this.scene.getObjectByName(searchedText);
+      // if (undefined !== object) {
+      //   (<any>(<Mesh>object).material).color = new Color("red");
+      // }
     };
 
     document.getElementsByClassName("searchbtn")[0].addEventListener('click', onSearch);
@@ -185,8 +205,12 @@ export class App {
         onSearch();
       }
     });
+
   }
 
+  private modelToView(){
+    this.campusView.modelToView(this.campus);
+  }
 
 
   private createControls(): obc.OrbitControls {
@@ -210,15 +234,17 @@ export class App {
     return controls
   }
 
+  private campusView: CampusView;
+
   private load() {
     const dataProvider = new CampusDataProvider();
-    const campus = dataProvider.getCampus();
+    this.campus = dataProvider.getCampus();
 
     const roomMaterial = new MeshBasicMaterial({ color: 0xff0000 });
 
-    for (let building of campus.buildings) {
-      this.scene.add(new BuildingView(building).getMesh());
-    }
+    this.campusView = new CampusView(this.campus);
+
+    this.scene.add(this.campusView.getMesh());
   }
 
   private attachRenderer() {

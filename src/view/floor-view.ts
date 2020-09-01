@@ -1,10 +1,12 @@
 import { Group, MeshBasicMaterial, MeshPhongMaterial } from "three";
-import { Floor } from "../model/model";
+import { Floor, Room } from "../model/model";
 import { MeshView } from "./view";
 import { RoomView } from "./room-view";
 import { DPolygon } from "./shapes/dpolygon";
+import { RoomProcessData } from "./processdata/room-processdata";
 
 export class FloorView extends MeshView {
+
 
     material = new MeshPhongMaterial({
         color: 0xff0000,
@@ -12,15 +14,23 @@ export class FloorView extends MeshView {
         transparent: true,
     });
 
+    private roomViews = Array<RoomView>();
+    private roomPD = new RoomProcessData();
+    private rooms = new Map<Room, RoomView>();
+
     constructor(floor: Floor) {
         super();
 
         this.group.add(new DPolygon(floor.geometry, floor.level, this.material).getMesh());
 
         for (let room of floor.rooms) {
-            this.group.add(new RoomView(room, floor.level).getMesh());
+            const roomView = new RoomView(room, floor.level);
+            this.group.add(roomView.getMesh());
+            this.roomViews.push(roomView);
         }
     }
 
-    
+    modelToView(): void {
+        this.roomViews.forEach(rv => rv.modelToView());
+    }
 }
