@@ -38,7 +38,6 @@ export class App {
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
-  private box: Mesh;
   private pickingScene: Scene;
   private campus: Campus;
   private lastSelectedRoom: Room;
@@ -112,12 +111,6 @@ export class App {
       color: 0xaaaaaa,
       wireframe: true,
     });
-
-    // create a box and add it to the scene
-    this.box = new Mesh(new BoxGeometry(1, 1, 1), material);
-    this.scene.add(this.box);
-    this.box.position.x = 0.5;
-    this.box.rotation.y = 0.5;
 
     var grid = new GridHelper(200, 10, 0xffffff, 0x888888);
     grid.geometry.rotateX(Math.PI / 2);
